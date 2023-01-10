@@ -13,6 +13,7 @@ import { AppState } from "./reducers";
 import { authFeatureKey } from "./auth/reducers";
 import { isLoggedIn, isLoggedOut } from "./auth/auth.selectors";
 import { AuthActions } from "./auth/action-types";
+import { login } from "./auth/auth.actions";
 
 @Component({
   selector: "app-root",
@@ -27,6 +28,10 @@ export class AppComponent implements OnInit {
   constructor(private router: Router, private store: Store<AppState>) {}
 
   ngOnInit() {
+    const userProfle = localStorage.getItem("user");
+    if (userProfle) {
+      this.store.dispatch(login({ user: JSON.parse(userProfle) }));
+    }
     this.router.events.subscribe((event) => {
       switch (true) {
         case event instanceof NavigationStart: {
@@ -57,6 +62,5 @@ export class AppComponent implements OnInit {
 
   logout() {
     this.store.dispatch(AuthActions.logout());
-    this.router.navigateByUrl('')
   }
 }
