@@ -1,13 +1,9 @@
-import { Store } from '@ngrx/store';
-import { AppState } from './../../reducers/index';
-import { Component, Inject } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { Course } from '../model/course';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Observable } from 'rxjs';
-import { CoursesHttpService } from '../services/courses-http.service';
-import { courseUpdated } from '../courses.actions';
-import { Update } from '@ngrx/entity';
+import {Component, Inject} from '@angular/core';
+import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
+import {Course} from '../model/course';
+import {FormBuilder, FormGroup, Validators} from '@angular/forms';
+import {Observable} from 'rxjs';
+import {CoursesHttpService} from '../services/courses-http.service';
 
 @Component({
   selector: 'course-dialog',
@@ -24,13 +20,13 @@ export class EditCourseDialogComponent {
 
   mode: 'create' | 'update';
 
-  loading$: Observable<boolean>;
+  loading$:Observable<boolean>;
 
   constructor(
     private fb: FormBuilder,
     private dialogRef: MatDialogRef<EditCourseDialogComponent>,
     @Inject(MAT_DIALOG_DATA) data,
-    private store: Store<AppState>) {
+    private coursesService: CoursesHttpService) {
 
     this.dialogTitle = data.dialogTitle;
     this.course = data.course;
@@ -45,7 +41,7 @@ export class EditCourseDialogComponent {
 
     if (this.mode == 'update') {
       this.form = this.fb.group(formControls);
-      this.form.patchValue({ ...data.course });
+      this.form.patchValue({...data.course});
     }
     else if (this.mode == 'create') {
       this.form = this.fb.group({
@@ -67,12 +63,11 @@ export class EditCourseDialogComponent {
       ...this.form.value
     };
 
-    const update: Update<Course> = {
-      id: course.id,
-      changes: course
-    }
-    this.store.dispatch(courseUpdated({ update }))
-    this.dialogRef.close()
+    this.coursesService.saveCourse(course.id, course)
+      .subscribe(
+        () => this.dialogRef.close()
+      )
+
 
   }
 
