@@ -1,3 +1,4 @@
+import { LessonEnityService } from './../services/lesson-entity.service';
 import { CourseEntityService } from './../services/course-entity.service';
 import { AfterViewInit, Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
@@ -19,12 +20,15 @@ export class CourseComponent implements OnInit {
 
   lessons$: Observable<Lesson[]>;
 
+  loading$: Observable<boolean>
+
   displayedColumns = ['seqNo', 'description', 'duration'];
 
   nextPage = 0;
 
   constructor(
     private coursesService: CourseEntityService,
+    private lessonEnityService: LessonEnityService,
     private route: ActivatedRoute) {
 
   }
@@ -38,13 +42,26 @@ export class CourseComponent implements OnInit {
         map(courses => courses.find(course => course.url == courseUrl))
       )
 
-    this.lessons$ = of([])
-
+    this.lessons$ = this.lessonEnityService.entities$
+      .pipe(
+        withLatestFrom(this.course$),
+        tap(([lessons, course]) => {
+          if (this.nextPage == 0) {
+            this.loadLessonsPage(course)
+          }
+        }),
+        map(([lessons, course]) => lessons.filter(lesson => lesson.courseId == course.id))
+      )
+    this.loading$ = this.lessonEnityService.loading$.pipe(delay(0))
   }
 
 
   loadLessonsPage(course: Course) {
-
+    this.lessonEnityService.getWithQuery({
+      'courseid': course.id.toString(),
+      'pageNumber': this.nextPage.toString(),
+      'pageSize': '3'
+    })
   }
 
 }
