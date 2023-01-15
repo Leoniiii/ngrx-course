@@ -33,6 +33,7 @@ export class HomeComponent implements OnInit {
   }
 
   ngOnInit() {
+    //Guardando cambios de ngrx entity in deep
     this.reload();
   }
 
