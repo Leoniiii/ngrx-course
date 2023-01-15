@@ -28,6 +28,7 @@ import { compareCourses, Course } from './model/course';
 import { compareLessons, Lesson } from './model/lesson';
 import { CourseEntityService } from './services/course-entity.service';
 import { CoursesDataService } from './services/courses-data.service';
+import { LessonEnityService } from './services/lesson-entity.service';
 
 
 export const coursesRoutes: Routes = [
@@ -52,6 +53,9 @@ const entityMetadata: EntityMetadataMap = {
       //Para hacer el update de manera optima
       optimisticUpdate: true
     }
+  },
+  Lesson: {
+    sortComparer: compareLessons
   }
 }
 
@@ -92,7 +96,8 @@ const entityMetadata: EntityMetadataMap = {
     CoursesHttpService,
     CourseEntityService,
     CoursesResolver,
-    CoursesDataService
+    CoursesDataService,
+    LessonEnityService
   ]
 })
 export class CoursesModule {
